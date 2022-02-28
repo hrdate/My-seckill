@@ -77,9 +77,9 @@
         </dependency>
         <!-- 验证码依赖 -->
         <dependency>
-            <groupId>com.github.whvcse</groupId>
-            <artifactId>easy-captcha</artifactId>
-            <version>1.6.2</version>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.7.5</version>
         </dependency>
         <!-- test组件 -->
         <dependency>
