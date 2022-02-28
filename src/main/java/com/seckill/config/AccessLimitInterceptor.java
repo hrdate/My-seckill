@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 自定义封装拦截器，拦截五秒内访问超过5次的用户
+ */
 @Component
 public class AccessLimitInterceptor implements HandlerInterceptor {
 
@@ -28,10 +31,19 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
 	@Autowired
 	private RedisTemplate redisTemplate;
 
+	/**
+	 * 拦截执行之前
+	 * @param request
+	 * @param response
+	 * @param handler
+	 * @return
+	 * @throws Exception
+	 */
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		if (handler instanceof HandlerMethod) {
 			User user = getUser(request, response);
+			//把user信息放入ThreadLocal中
 			UserContext.setUser(user);
 			HandlerMethod hm = (HandlerMethod) handler;
 			AccessLimit accessLimit = hm.getMethodAnnotation(AccessLimit.class);

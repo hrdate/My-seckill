@@ -1,7 +1,7 @@
 # My-seckill
  简单秒杀demo，不考虑集群/微服务
 
-前后端不分离，使用thymeleaf模板引擎 + jquery-validation  + ajax + js + bootsrap
+前后端不分离，只是单纯的在界面请求接口，使用thymeleaf模板引擎 + jquery-validation  + ajax + js + bootsrap
 
 后端技术：Spring Boot + Mybatis-Plus + MySQL + Redis + RabbitMQ
 
@@ -9,17 +9,14 @@
 
 项目描述：
 
-页面静态化 + 部分对象静态化处理（也可以考虑使用CDN）降低网络拥塞 
-
-预热秒杀商品基本信息，防止缓存击穿
-
-Mybatis-Plus操作数据库使用SQL语句，且同时把用户id + 商品id设置为唯一索引
-
-使用Redis + LUA脚本 + MySQL的InnoDB引擎执行SQL语句，保证原子性操作
-
-使用RabbitMQ异步操作，流量削峰
-
-Redis + LUA脚本，由于把LUA脚本放在在Java端所以每次都会把该脚本发送给Redis故导致吞吐量降低
+- [ ] 页面静态化 + 部分对象静态化处理降低网络拥塞 ~~（也可以考虑使用CDN）~~
+- [ ] 预热秒杀商品基本信息，防止缓存击穿
+- [ ] Mybatis-Plus操作数据库MySQL的InnoDB引擎执行SQL语句，且同时把用户id + 商品id设置为唯一索引
+- [ ] 使用RabbitMQ异步操作，流量削峰
+- [ ] Redis + LUA脚本保证原子性~~（但由于把LUA脚本放在在Java端所以每次都会把该脚本发送给Redis故导致吞吐量降低）~~
+- [ ] 秒杀接口隐藏
+- [ ] hutool工具验证码
+- [ ] 计数器方法接口限流
 
 使用jmeter测试当前情况下秒杀商品，设置线程组为1000线程数，循环10次
 
