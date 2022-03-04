@@ -1,6 +1,7 @@
 package com.seckill.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.util.concurrent.RateLimiter;
 import com.seckill.comment.RespBean;
 import com.seckill.comment.RespBeanEnum;
 import com.seckill.entity.User;
@@ -18,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,6 +33,7 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
 	private UserService userService;
 	@Autowired
 	private RedisTemplate redisTemplate;
+
 
 	/**
 	 * 拦截执行之前
@@ -64,7 +68,7 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
 			ValueOperations valueOperations = redisTemplate.opsForValue();
 			Integer count = (Integer) valueOperations.get(key);
 			if (count == null) {
-				valueOperations.set(key, 1, second, TimeUnit.SECONDS);
+				valueOperations.set(key, 1, second, accessLimit.timeunit());
 			} else if (count < maxCount) {
 				valueOperations.increment(key);
 			} else {

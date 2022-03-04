@@ -108,7 +108,13 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.6</version>
         </dependency>
-    </dependencies>
+        <!-- 令牌桶 -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>27.1-jre</version>
+        </dependency>
+       </dependencies>
 
     <dependencyManagement>
         <dependencies>

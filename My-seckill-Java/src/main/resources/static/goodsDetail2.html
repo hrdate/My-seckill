@@ -40,21 +40,33 @@
 <!--                <span th:if="${secKillStatus eq 2}">秒杀已结束</span>-->
 <!--            </td>-->
             <td id="startTime"></td>
-                 <td>
                    <input type="hidden" id="remainSeconds"/>
                    <span id="seckillTip"></span>
-                 </td>
+
             <td>
-<!--                <form id="secKillForm" method="post" action="/seckill/doSeckill">-->
-<!--                    <button class="btn btn-primary btn-block" type="submit"-->
-<!--                            id="buyButton">立即秒杀</button>-->
-<!--                     <input type="hidden" name="goodsId" id="goodsId"/>-->
-<!--                </form>-->
-                <button class="btn btn-primary btn-block" type="button" id="buyButton"
-                         onclick="doSeckill()">立即秒杀
-                 </button>
-                 <input type="hidden" name="goodsId" id="goodsId"/>
+            <td>
+                <div class="row">
+                     <div class="form-inline">
+                       <img id="captchaImg" width="130" height="32" style="display: none"
+                            onclick="refreshCaptcha()"/>
+                       <input id="captcha" class="form-control" style="display: none"/>
+                       <button class="btn btn-primary" type="button" id="buyButton"
+                               onclick="getSeckillPath()">立即秒杀
+                       </button>
+                     </div>
+                </div>
             </td>
+<!--            <td>-->
+<!--&lt;!&ndash;                <form id="secKillForm" method="post" action="/seckill/doSeckill">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <button class="btn btn-primary btn-block" type="submit"&ndash;&gt;-->
+<!--&lt;!&ndash;                            id="buyButton">立即秒杀</button>&ndash;&gt;-->
+<!--&lt;!&ndash;                     <input type="hidden" name="goodsId" id="goodsId"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                </form>&ndash;&gt;-->
+<!--                <button class="btn btn-primary btn-block" type="button" id="buyButton"-->
+<!--                         onclick="getSeckillPath()">立即秒杀-->
+<!--                 </button>-->
+<!--                 <input type="hidden" name="goodsId" id="goodsId"/>-->
+<!--            </td>-->
         </tr>
         <tr>
             <td>商品原价</td>
@@ -76,6 +88,10 @@
         // countDown();
         getDetails();
     });
+    function refreshCaptcha() {
+        var goodsId = g_getQueryString("goodsId");
+        $("#captchaImg").attr("src", "/seckill/captcha?goodsId=" + goodsId + "&time=" + new Date())
+    }
 
     function getDetails() {
         var goodsId = g_getQueryString("goodsId");
@@ -119,7 +135,7 @@
         if (remainSeconds > 0) {
             $("#buyButton").attr("disabled", true);
             timeout = setTimeout(function () {
-                $("#countDown").text(remainSeconds - 1);
+                // $("#countDown").text(remainSeconds - 1);
                 $("#remainSeconds").val(remainSeconds - 1);
                 countDown();
             }, 1000);
@@ -129,16 +145,47 @@
             if (timeout) {
                 clearTimeout(timeout);
             }
-            $("#seckillTip").html("秒杀进行中")
+            $("#seckillTip").html("秒杀进行中");
+            var goodsId = g_getQueryString("goodsId");
+            $("#captchaImg").attr("src", "/seckill/captcha?goodsId=" + goodsId);
+            $("#captchaImg").show();
+            $("#captcha").show();
         } else {
             $("#buyButton").attr("disabled", true);
             $("#seckillTip").html("秒杀已经结束");
+            $("#captchaImg").hide();
+            $("#captcha").hide();
         }
     };
-
-    function doSeckill() {
+    function getSeckillPath() {
+        var goodsId = $("#goodsId").val();
+        var captcha = $("#captcha").val();
+        g_showLoading();
         $.ajax({
-            url: "/seckill/doSeckill2",
+            url: "/seckill/path",
+            type: "GET",
+            data: {
+                goodsId: goodsId,
+                captcha: captcha,
+            },
+            success: function (data) {
+                if (data.code == 200) {
+                    var path = data.obj;
+                    doSeckill(path);
+                } else {
+                    layer.msg(data.message);
+                }
+            }
+            ,
+            error: function () {
+                layer.msg("客户端请求错误");
+            }
+        })
+    }
+
+    function doSeckill(path) {
+        $.ajax({
+            url: "/seckill/" + path +"/doSeckill2",
             type: "POST",
             data: {
                 goodsId: $("#goodsId").val(),

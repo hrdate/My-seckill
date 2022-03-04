@@ -1,5 +1,6 @@
 package com.seckill.config;
 
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -21,6 +22,8 @@ public class WebConfig implements WebMvcConfigurer {
     private UserArgumentResolver userArgumentResolver;
     @Autowired
     private AccessLimitInterceptor accessLimitInterceptor;
+    @Autowired
+    private ApiLimitInterceptor apiLimitInterceptor;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
@@ -35,5 +38,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(accessLimitInterceptor);
+        registry.addInterceptor(apiLimitInterceptor);
     }
 }

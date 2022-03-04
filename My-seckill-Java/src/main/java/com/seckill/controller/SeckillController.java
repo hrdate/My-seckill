@@ -9,6 +9,7 @@ import com.seckill.comment.RespBean;
 import com.seckill.comment.RespBeanEnum;
 import com.seckill.comment.exception.GlobalException;
 import com.seckill.config.AccessLimit;
+import com.seckill.config.ApiLimit;
 import com.seckill.entity.Order;
 import com.seckill.entity.SeckillMessage;
 import com.seckill.entity.SeckillOrder;
@@ -79,6 +80,9 @@ public class SeckillController implements InitializingBean {
      * @param goodsId
      * @return
      */
+
+    @AccessLimit
+    @ApiLimit
     @PostMapping("/{path}/doSeckill2")
     @ResponseBody
     public RespBean doSeckill2(@PathVariable String path, User user, Long goodsId) {
@@ -106,7 +110,7 @@ public class SeckillController implements InitializingBean {
         
         ValueOperations valueOperations = redisTemplate.opsForValue();
         boolean check = orderService.checkPath(user,goodsId,path);
-        if (!check){
+        if (!check) {
          return RespBean.error(RespBeanEnum.REQUEST_ILLEGAL);
         }
         //判断是否重复抢购
