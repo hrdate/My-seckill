@@ -18,13 +18,13 @@ public @interface AccessLimit {
 	 * 时间范围
 	 * @return
 	 */
-	int second() default 5;
+	int second() default 2;
 
 	/**
 	 * 最大范围次数
 	 * @return
 	 */
-	int maxCount() default 5;
+	int maxCount() default 2;
 
 	/**
 	 * 超时时间单位 默认:毫秒

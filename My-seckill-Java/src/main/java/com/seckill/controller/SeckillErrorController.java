@@ -1,7 +1,6 @@
 package com.seckill.controller;
 
 
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -12,14 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
  * </p>
  *
  * @author ……hrdate……
- * @since 2022-02-21
+ * @since 2022-03-10
  */
 @RestController
-@RequestMapping("/seckillGoods")
-public class SeckillGoodsController implements InitializingBean {
+@RequestMapping("/seckillError")
+public class SeckillErrorController {
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-
-    }
 }

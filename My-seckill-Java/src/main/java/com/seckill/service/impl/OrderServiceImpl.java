@@ -67,12 +67,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         SeckillGoods seckillGoods = seckillGoodsService.getOne(new LambdaQueryWrapper<SeckillGoods>()
                 .eq(SeckillGoods::getGoodsId, goods.getId()));
         seckillGoods.setStockCount(seckillGoods.getStockCount() - 1);
-//        seckillGoodsService.updateById(seckillGoods);
-//        boolean seckillGoodsResult = seckillGoodsService.update(new
-//                LambdaUpdateWrapper<SeckillGoods>()
-//                .set(SeckillGoods::getStockCount,seckillGoods.getStockCount())
-//                .eq(SeckillGoods::getId, seckillGoods.getId())
-//                .gt(SeckillGoods::getStockCount, 0));
         //执行sql语句，数据库引擎innodb可以保证原子性
         boolean seckillGoodsResult = seckillGoodsService.update(new UpdateWrapper<SeckillGoods>()
                 .setSql("stock_count = " + "stock_count - 1")

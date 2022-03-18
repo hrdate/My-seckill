@@ -5,6 +5,8 @@ import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.LineCaptcha;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnels;
 import com.seckill.comment.RespBean;
 import com.seckill.comment.RespBeanEnum;
 import com.seckill.comment.exception.GlobalException;
@@ -69,6 +71,10 @@ public class SeckillController implements InitializingBean {
 
     @Autowired
     private MQSender mqSender;
+
+    //布隆过滤器
+    private BloomFilter<Long> bloomFilter = BloomFilter.create(Funnels.longFunnel(),10);
+
     private Map<Long, Boolean> EmptyStockMap = new HashMap<>();
 
     @Autowired
@@ -89,29 +95,20 @@ public class SeckillController implements InitializingBean {
         if (user == null) {
             return RespBean.error(RespBeanEnum.SESSION_ERROR);
         }
-//        GoodsVo goods = goodsService.findGoodsVoByGoodsId(goodsId);
-//        //判断库存
-//        if (goods.getStockCount() < 1) {
-//            return RespBean.error(RespBeanEnum.EMPTY_STOCK);
-//        }
-//        //判断是否重复抢购
-////        SeckillOrder seckillOrder = seckillOrderService.getOne(new LambdaQueryWrapper<SeckillOrder>()
-////               .eq(SeckillOrder::getUserId,user.getId()).eq(SeckillOrder::getGoodsId,goodsId));
-////        if (seckillOrder != null) {
-////            return RespBean.error(RespBeanEnum.REPEATE_ERROR);
-////        }
-//          //默认缓存时间大于秒杀时间
-//        String seckillOrderJson = (String) redisUtil.get("order:" + user.getId() + ":" + goodsId);
-//        if (!StringUtils.isEmpty(seckillOrderJson)) {
-//            return RespBean.error(RespBeanEnum.REPEATE_ERROR);
-//        }
-//        Order order = orderService.seckill(user, goods);
-//        return RespBean.success(order);
-        
+        //布隆过滤器消除访问不在商品id的请求
+        if(!bloomFilter.mightContain(goodsId)){
+            return RespBean.error(RespBeanEnum.GOOD_NOT_EXIST);
+        }
+        //内存中的map进行标记秒杀商品已经售空
+        //内存标记,减少Redis访问
+        if (EmptyStockMap.get(goodsId)) {
+            return RespBean.error(RespBeanEnum.EMPTY_STOCK);
+        }
         ValueOperations valueOperations = redisTemplate.opsForValue();
+        //检验秒杀路径
         boolean check = orderService.checkPath(user,goodsId,path);
         if (!check) {
-         return RespBean.error(RespBeanEnum.REQUEST_ILLEGAL);
+            return RespBean.error(RespBeanEnum.REQUEST_ILLEGAL);
         }
         //判断是否重复抢购
         String seckillOrderJson = (String) valueOperations.get("order:" +
@@ -119,19 +116,20 @@ public class SeckillController implements InitializingBean {
         if (!StringUtils.isEmpty(seckillOrderJson)) {
             return RespBean.error(RespBeanEnum.REPEATE_ERROR);
         }
-        //内存中的map进行标记秒杀商品已经售空
-        //内存标记,减少Redis访问
-        if (EmptyStockMap.get(goodsId)) {
-            return RespBean.error(RespBeanEnum.EMPTY_STOCK);
+        //分布式锁防止同个用户同时请求多次
+        Boolean ifAbsent = valueOperations.setIfAbsent("order:" + user.getId() + ":" + goodsId, "1",
+                1,TimeUnit.SECONDS);
+        if (!ifAbsent) {
+            return RespBean.error(RespBeanEnum.REPEATE_ERROR);
         }
         //预减库存
-//          Long stock = valueOperations.decrement("seckillGoods:" + goodsId);
         //使用redis+lua脚本保证操作的原子性 预减库存
         Long stock = (Long) redisTemplate.execute
                 (script, Collections.singletonList("seckillGoods:" + goodsId), Collections.EMPTY_LIST);
         if (stock < 0) {
             //内存中的map进行标记秒杀商品已经售空
             EmptyStockMap.put(goodsId,true);
+            redisTemplate.delete("order:" + user.getId() + ":" + goodsId);
             valueOperations.set("seckillGoods:" + goodsId, 0);
             return RespBean.error(RespBeanEnum.EMPTY_STOCK);
         }
@@ -141,41 +139,41 @@ public class SeckillController implements InitializingBean {
         return RespBean.success(0);
     }
 
-    /**
-     * 进行秒杀购买商品，已弃用
-     *
-     * @param model
-     * @param user
-     * @param goodsId
-     * @return
-     */
-    @RequestMapping("/doSeckill")
-    public String doSeckill(Model model, User user, Long goodsId) {
-        if (user == null) {
-            log.info("未登录请求秒杀，跳转登录界面");
-            return "login";
-        }
-        model.addAttribute("user", user);
-        GoodsVo goods = goodsService.findGoodsVoByGoodsId(goodsId);
-        //判断库存
-        if (goods.getStockCount() < 1) {
-            model.addAttribute("errmsg", RespBeanEnum.EMPTY_STOCK.getMessage());
-            return "seckillFail";
-        }
-        //判断是否重复抢购
-        SeckillOrder seckillOrder = seckillOrderService.getOne(new
-                LambdaQueryWrapper<SeckillOrder>()
-                .eq(SeckillOrder::getUserId, user.getId()).eq(SeckillOrder::getGoodsId, goodsId));
-        if (seckillOrder != null) {
-            model.addAttribute("errmsg", RespBeanEnum.REPEATE_ERROR.getMessage());
-            return "seckillFail";
-        }
-        Order order = orderService.seckill(user, goods);
-        model.addAttribute("order",order);
-        model.addAttribute("goods",goods);
-        return "orderDetail";
-    }
-
+//    /**
+//     * 进行秒杀购买商品，已弃用
+//     *
+//     * @param model
+//     * @param user
+//     * @param goodsId
+//     * @return
+//     */
+//    @RequestMapping("/doSeckill")
+//    public String doSeckill(Model model, User user, Long goodsId) {
+//        if (user == null) {
+//            log.info("未登录请求秒杀，跳转登录界面");
+//            return "login";
+//        }
+//        model.addAttribute("user", user);
+//        GoodsVo goods = goodsService.findGoodsVoByGoodsId(goodsId);
+//        //判断库存
+//        if (goods.getStockCount() < 1) {
+//            model.addAttribute("errmsg", RespBeanEnum.EMPTY_STOCK.getMessage());
+//            return "seckillFail";
+//        }
+//        //判断是否重复抢购
+//        SeckillOrder seckillOrder = seckillOrderService.getOne(new
+//                LambdaQueryWrapper<SeckillOrder>()
+//                .eq(SeckillOrder::getUserId, user.getId()).eq(SeckillOrder::getGoodsId, goodsId));
+//        if (seckillOrder != null) {
+//            model.addAttribute("errmsg", RespBeanEnum.REPEATE_ERROR.getMessage());
+//            return "seckillFail";
+//        }
+//        Order order = orderService.seckill(user, goods);
+//        model.addAttribute("order",order);
+//        model.addAttribute("goods",goods);
+//        return "orderDetail";
+//    }
+//
 
 
     @Override
@@ -187,6 +185,7 @@ public class SeckillController implements InitializingBean {
         list.forEach(goodsVo -> {
             redisTemplate.opsForValue().set("seckillGoods:" + goodsVo.getId(),
                     goodsVo.getStockCount());
+            bloomFilter.put(goodsVo.getId());
             //内存中的map进行标记秒杀商品未售空
             EmptyStockMap.put(goodsVo.getId(), false);
         });

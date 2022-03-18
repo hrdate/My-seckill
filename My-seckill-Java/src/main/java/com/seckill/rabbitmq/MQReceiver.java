@@ -23,6 +23,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.seckill.config.RabbitMQConfig.*;
 
@@ -47,32 +48,35 @@ public class MQReceiver {
                     exchange = @Exchange(type = "topic",name = EXCHANGE_SECKILL)
             )
     })
-    public void receive(String msg, Channel channel, Message message) throws IOException {
-        logger.info("QUEUE接受消息：" + msg);
+    public void receive(Channel channel, Message message) throws IOException {
+        logger.info("QUEUE接受消息:" + message.getMessageProperties().getMessageId());
+
         //消息投递序号
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
-//        String msgId = (String) message.getMessageProperties().getHeaders().get("spring_returned_message_correlation");
         try {
-            SeckillMessage seckillMessage = JsonUtil.jsonStr2Object(msg, SeckillMessage.class);
-            Long goodsId = seckillMessage.getGoodsId();
-            User user = seckillMessage.getUser();
-            GoodsVo goods = goodsService.findGoodsVoByGoodsId(goodsId);
-            //判断库存
-            if (goods.getStockCount() < 1) {
-                return;
+            if(redisTemplate.opsForValue().setIfAbsent(message.getMessageProperties().getMessageId(),"1")){
+                SeckillMessage seckillMessage = JsonUtil.jsonStr2Object(message.getBody().toString(), SeckillMessage.class);
+                Long goodsId = seckillMessage.getGoodsId();
+                User user = seckillMessage.getUser();
+                GoodsVo goods = goodsService.findGoodsVoByGoodsId(goodsId);
+                //判断库存
+                if (goods.getStockCount() < 1) {
+                    return;
+                }
+                //判断是否重复抢购
+                String seckillOrderJson = (String)
+                        redisTemplate.opsForValue().get("order:" + user.getId() + ":" + goodsId);
+                if (!StringUtils.isEmpty(seckillOrderJson)) {
+                    return;
+                }
+                orderService.seckill(user, goods);
+                //deliveryTag:该消息的index,multiple：是否批量.true:将一次性ack所有小于deliveryTag的消息。
+                //第三个参数：requeue：重回队列。如果设置为true，则消息重新回到queue，broker会重新发送该消息给消费端
+                channel.basicAck(deliveryTag,false);
+            } else {
+                channel.basicAck(deliveryTag,false);
+                logger.warn("消息{}已经被完成，忽略",message.getMessageProperties().getMessageId());
             }
-            //判断是否重复抢购
-//        SeckillOrder seckillOrder = seckillOrderService.getOne(new QueryWrapper<SeckillOrder>()
-//                .eq("user_id", user.getId()).eq("goods_id", goodsId));
-            String seckillOrderJson = (String)
-                    redisTemplate.opsForValue().get("order:" + user.getId() + ":" + goodsId);
-            if (!StringUtils.isEmpty(seckillOrderJson)) {
-                return;
-            }
-            orderService.seckill(user, goods);
-            //deliveryTag:该消息的index,multiple：是否批量.true:将一次性ack所有小于deliveryTag的消息。
-            //第三个参数：requeue：重回队列。如果设置为true，则消息重新回到queue，broker会重新发送该消息给消费端
-            channel.basicAck(deliveryTag,false);
         }catch (Exception exception) {
             logger.error("消息{}消费过程异常错误",message.toString());
 //            deliveryTag:该消息的index

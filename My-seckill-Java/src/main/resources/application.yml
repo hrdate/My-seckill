@@ -78,11 +78,11 @@ spring:
     # 服务器
     host: 192.168.96.133
     #用户名
-    username: guest
+    username: hrd
     #密码
-    password: guest
+    password: hrd
     # 虚拟主机
-    virtual-host: /
+    virtual-host: /seckill
     #端口
     port: 5672
     #生成者
