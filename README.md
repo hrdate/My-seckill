@@ -3,12 +3,13 @@
 
 前后端不分离，只是单纯的在界面请求接口，使用thymeleaf模板引擎 + jquery-validation  + ajax + js + bootsrap
 
-后端技术：Spring Boot + Mybatis-Plus + MySQL + Redis + RabbitMQ
+后端技术：Spring Boot +  Gateway网关  +  Mybatis-Plus + MySQL + Redis + RabbitMQ
 
 测压工具：apache-jmeter-5.4.3
 
 项目描述：
 
+- [ ] 使用Spring Cloud网关Gateway进行转发路由到具体模块
 - [ ] 页面静态化 + 部分对象静态化处理降低网络拥塞 ~~（也可以考虑使用CDN）~~
 - [ ] 预热秒杀商品基本信息，防止缓存击穿
 - [ ] Mybatis-Plus操作数据库MySQL的InnoDB引擎执行SQL语句，且同时把用户id + 商品id设置为唯一索引
