@@ -10,6 +10,7 @@
 项目描述：
 
 - [ ] 使用Spring Cloud网关Gateway进行转发路由到具体模块
+- [ ]  Gateway中配合Redis使用限流RequestRateLimiter(自定义令牌桶规则是主机名)
 - [ ] 页面静态化 + 部分对象静态化处理降低网络拥塞 ~~（也可以考虑使用CDN）~~
 - [ ] 预热秒杀商品基本信息，防止缓存击穿
 - [ ] Mybatis-Plus操作数据库MySQL的InnoDB引擎执行SQL语句，且同时把用户id + 商品id设置为唯一索引

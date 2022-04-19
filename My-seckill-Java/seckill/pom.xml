@@ -19,6 +19,17 @@
     </properties>
 
     <dependencies>
+<!--        &lt;!&ndash; nacos客户端依赖包 &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash;nacos的配置管理依赖&ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>-->
+<!--        </dependency>-->
+<!--        -->
         <!-- AMQP依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
