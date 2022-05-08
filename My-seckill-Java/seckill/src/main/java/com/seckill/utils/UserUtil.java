@@ -1,8 +1,8 @@
 package com.seckill.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seckill.comment.RespBean;
 import com.seckill.entity.User;
+import comment.RespBean;
 
 import java.io.*;
 import java.net.HttpURLConnection;

@@ -1,0 +1,8 @@
+com\gateway\feign\UserClient.class
+com\gateway\filter\AuthGlobalFilter.class
+com\gateway\keyResolver\MyKeyResolver.class
+com\gateway\GatewayApplication.class
+com\gateway\config\DefaultFeignConfiguration.class
+com\gateway\config\RedisConfig.class
+com\gateway\entity\User.class
+com\gateway\utils\JwtUtil.class

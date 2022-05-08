@@ -8,7 +8,6 @@ import com.seckill.service.SeckillOrderService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seckill.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 /**

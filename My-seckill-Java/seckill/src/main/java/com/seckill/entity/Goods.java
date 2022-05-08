@@ -20,7 +20,6 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("t_goods")
 public class Goods implements Serializable {
 
     private static final long serialVersionUID = 1L;

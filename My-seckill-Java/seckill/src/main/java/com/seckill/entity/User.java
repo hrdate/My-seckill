@@ -1,7 +1,7 @@
 package com.seckill.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -20,7 +20,6 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("t_user")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;

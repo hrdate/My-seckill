@@ -1,32 +1,31 @@
 package com.seckill.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.seckill.comment.RespBeanEnum;
-import com.seckill.comment.exception.GlobalException;
 import com.seckill.entity.Order;
 import com.seckill.entity.SeckillGoods;
 import com.seckill.entity.SeckillOrder;
 import com.seckill.entity.User;
+import com.seckill.feign.GoodsClient;
 import com.seckill.mapper.OrderMapper;
-import com.seckill.service.GoodsService;
 import com.seckill.service.OrderService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seckill.service.SeckillGoodsService;
 import com.seckill.service.SeckillOrderService;
-import com.seckill.utils.JsonUtil;
 import com.seckill.utils.MD5Util;
 import com.seckill.utils.RedisUtil;
 import com.seckill.utils.UUIDUtil;
 import com.seckill.vo.GoodsVo;
 import com.seckill.vo.OrderDetailVo;
+import comment.RespBeanEnum;
+import comment.exception.GlobalException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -44,9 +43,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Autowired
     private SeckillGoodsService seckillGoodsService;
     @Autowired
-    private GoodsService goodsService;
-    @Autowired
     private OrderMapper orderMapper;
+    @Autowired
+    private GoodsClient goodsClient;
     @Autowired
     private SeckillOrderService seckillOrderService;
     @Autowired
@@ -56,13 +55,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     /**
      * 秒杀
-     * @param user
      * @param goods
      * @return
      */
     @Transactional
     @Override
-    public Order seckill(User user, GoodsVo goods) {
+    public Order seckill(User user,GoodsVo goods) {
         //秒杀商品表减库存
         SeckillGoods seckillGoods = seckillGoodsService.getOne(new LambdaQueryWrapper<SeckillGoods>()
                 .eq(SeckillGoods::getGoodsId, goods.getId()));
@@ -77,7 +75,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         //生成订单
         Order order = new Order();
+
         order.setUserId(user.getId());
+
         order.setGoodsId(goods.getId());
         order.setDeliveryAddrId(0L);
         order.setGoodsName(goods.getGoodsName());
@@ -111,7 +111,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             throw new GlobalException(RespBeanEnum.ORDER_NOT_EXIST);
         }
         Order order = orderMapper.selectById(orderId);
-        GoodsVo goodsVo = goodsService.findGoodsVoByGoodsId(order.getGoodsId());
+        GoodsVo goodsVo = goodsClient.findGoodsVoByGoodsId(order.getGoodsId());
         OrderDetailVo detail = new OrderDetailVo();
         detail.setGoodsVo(goodsVo);
         detail.setOrder(order);

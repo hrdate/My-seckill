@@ -3,11 +3,11 @@ package com.seckill.service.impl;
 import com.seckill.entity.SeckillError;
 import com.seckill.entity.SeckillMessage;
 import com.seckill.entity.User;
+import com.seckill.feign.UserClient;
 import com.seckill.mapper.SeckillErrorMapper;
 import com.seckill.rabbitmq.MQSender;
 import com.seckill.service.SeckillErrorService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seckill.service.UserService;
 import com.seckill.utils.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,7 +28,7 @@ public class SeckillErrorServiceImpl extends ServiceImpl<SeckillErrorMapper, Sec
     @Autowired
     SeckillErrorService seckillErrorService;
     @Autowired
-    UserService userService;
+    UserClient userClient;
     @Autowired
     private MQSender mqSender;
 
@@ -40,7 +40,7 @@ public class SeckillErrorServiceImpl extends ServiceImpl<SeckillErrorMapper, Sec
             List<SeckillError> seckillErrorList = seckillErrorService.list();
             for (int i = 0; i < seckillErrorList.size(); i++) {
                 SeckillError seckillError = seckillErrorList.get(i);
-                User user = userService.getById(seckillError.getUserId());
+                User user = userClient.findUserById(seckillError.getUserId());
                 Long goodsId  = seckillError.getGoodsId();
                 // 请求入队，立即返回排队中
                 SeckillMessage message = new SeckillMessage(user, goodsId);

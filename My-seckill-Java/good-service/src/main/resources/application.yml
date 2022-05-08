@@ -1,0 +1,73 @@
+#配置端口
+server:
+  port: 8085
+  servlet:
+    session:
+      timeout: 21600
+
+spring:
+  application:
+    name: good-service
+  cloud:
+    nacos:
+      server-addr: 127.0.0.1:8848 # nacos地址
+      config:
+        file-extension: yaml     # 文件后缀名
+  #配置mysql数据库
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/seckill?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    hikari:
+      minimum-idle: 5
+      # 空闲连接存活最大时间，默认600000（10分钟）
+      idle-timeout: 180000
+      # 连接池最大连接数，默认是10
+      maximum-pool-size: 10
+      # 此属性控制从池返回的连接的默认自动提交行为,默认值：true
+      auto-commit: true
+      # 连接池名称
+      pool-name: MyHikariCP
+      # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
+      max-lifetime: 1800000
+      # 数据库连接超时时间,默认30秒，即30000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+
+  # redis配置
+  redis:
+    #服务器地址
+    host: 127.0.0.1
+    #端口
+    port: 6379
+    #数据库编号
+    database: 1
+    #超时时间
+    timeout: 10000ms
+    #密码
+    #    password: root
+    lettuce:
+      pool:
+        #最大连接数，默认8
+        max-active: 8
+        #最大连接阻塞等待时间，默认-1
+        max-wait: 10000ms
+        #最大空闲连接，默认8
+        max-idle: 200
+        #最小空闲连接，默认0
+        min-idle: 5
+
+#Mybatis-plus配置
+mybatis-plus:
+  # 配置Mapper.xml映射文件
+  mapper-locations: classpath*:/mapper/*.xml
+  # 配置MyBatis数据返回类型别名(默认别名是类名)
+  type-aliases-package: com.goodservice.entity
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+
+
+

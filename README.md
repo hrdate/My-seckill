@@ -1,26 +1,29 @@
 # My-seckill
- 简单秒杀demo，~~不考虑集群/微服务~~
+ 简单秒杀和支付demo，~~不考虑集群/微服务~~（已升级重构用Spring Cloud）
 
-前后端不分离，只是单纯的在界面请求接口，使用thymeleaf模板引擎 + jquery-validation  + ajax + js + bootsrap
+~~前后端不分离，只是单纯的在界面请求接口，使用thymeleaf模板引擎 + jquery-validation  + ajax + js + bootsrap~~（重构后，还没成功用Vue.js重写前端项目，目前还只是用Spring Boot项目静态资源展示）
 
-后端技术：Spring Boot +  Gateway网关  +  Mybatis-Plus + MySQL + Redis + RabbitMQ
+后端技术：Spring Boot + Spring Cloud Alibaba +  Mybatis-Plus + MySQL + Redis + RabbitMQ
 
 测压工具：apache-jmeter-5.4.3
 
+其中选用网关Gateway，注册中心Nacos，远程调用Open Feign，支付组件Payment-Spring Boot
+
 项目描述：
 
-- [ ] 使用Spring Cloud网关Gateway进行转发路由到具体模块
-- [ ]  Gateway中配合Redis使用限流RequestRateLimiter(自定义令牌桶规则是主机名)
+- [x] 使用网关Gateway和注册中心Nacos进行转发路由到具体模块
+- [x]  Gateway中配合Redis使用限流RequestRateLimiter(自定义令牌桶规则是主机名)
 - [ ] 页面静态化 + 部分对象静态化处理降低网络拥塞 ~~（也可以考虑使用CDN）~~
-- [ ] 预热秒杀商品基本信息，防止缓存击穿
-- [ ] Mybatis-Plus操作数据库MySQL的InnoDB引擎执行SQL语句，且同时把用户id + 商品id设置为唯一索引
-- [ ] 使用RabbitMQ异步操作，流量削峰，设置队列和交换机持久化
-- [ ] 采用确认和回退机制，把提交失败的信息存入数据库错误表中~~后期可以考虑用定时任务处理~~
-- [ ] Redis + LUA脚本保证原子性~~（但由于把LUA脚本放在在Java端所以每次都会把该脚本发送给Redis故导致吞吐量降低）~~
-- [ ] 当秒杀商品为0时，用内存中的变量标识，反之无效的再次访问Redis
-- [ ] 秒杀接口隐藏，定点修改界面JS
-- [ ] hutool工具验证码
-- [ ] 自定义注解拦截器，计数器方法和令牌桶算法，两种接口限流
+- [x] 预热秒杀商品基本信息，防止缓存击穿
+- [x] Mybatis-Plus操作数据库MySQL的InnoDB引擎执行SQL语句，且同时把用户id + 商品id设置为唯一索引
+- [x] 使用RabbitMQ异步操作，流量削峰，设置队列和交换机持久化
+- [x] 采用确认和回退机制，把提交失败的信息存入数据库错误表中~~后期可以考虑用定时任务处理~~
+- [x] Redis + LUA脚本保证原子性~~（但由于把LUA脚本放在在Java端所以每次都会把该脚本发送给Redis故导致吞吐量降低）~~
+- [x] 当秒杀商品为0时，用内存中的变量标识，反之无效的再次访问Redis
+- [x] 秒杀接口隐藏，定点修改界面JS
+- [x] hutool工具验证码
+- [x] 自定义注解拦截器，计数器方法和令牌桶算法，两种接口限流
+- [ ] 微信支付Native方式，回调确认支付成功，~~支持查单~~
 
 秒杀下单的关键代码如下图：
 

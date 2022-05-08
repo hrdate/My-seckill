@@ -3,9 +3,8 @@ package com.seckill.rabbitmq;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.rabbitmq.client.Channel;
 import com.seckill.entity.SeckillMessage;
-import com.seckill.entity.SeckillOrder;
 import com.seckill.entity.User;
-import com.seckill.service.GoodsService;
+import com.seckill.feign.GoodsClient;
 import com.seckill.service.OrderService;
 import com.seckill.service.SeckillOrderService;
 import com.seckill.utils.JsonUtil;
@@ -23,7 +22,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static com.seckill.config.RabbitMQConfig.*;
 
@@ -34,13 +32,13 @@ public class MQReceiver {
     private static Logger logger =   LoggerFactory.getLogger(MQReceiver.class);
 
     @Autowired
-    private GoodsService goodsService;
-    @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
     private OrderService orderService;
     @Autowired
     private SeckillOrderService seckillOrderService;
+    @Autowired
+    GoodsClient goodsClient;
 
     @RabbitListener(bindings = {
             @QueueBinding(
@@ -58,7 +56,7 @@ public class MQReceiver {
                 SeckillMessage seckillMessage = JsonUtil.jsonStr2Object(message.getBody().toString(), SeckillMessage.class);
                 Long goodsId = seckillMessage.getGoodsId();
                 User user = seckillMessage.getUser();
-                GoodsVo goods = goodsService.findGoodsVoByGoodsId(goodsId);
+                GoodsVo goods = goodsClient.findGoodsVoByGoodsId(goodsId);
                 //判断库存
                 if (goods.getStockCount() < 1) {
                     return;

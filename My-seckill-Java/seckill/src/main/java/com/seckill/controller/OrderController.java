@@ -1,16 +1,21 @@
 package com.seckill.controller;
 
 
-import com.seckill.comment.RespBean;
-import com.seckill.comment.RespBeanEnum;
+
+
+import com.google.gson.Gson;
 import com.seckill.entity.User;
 import com.seckill.service.OrderService;
 import com.seckill.vo.OrderDetailVo;
+import comment.RespBean;
+import comment.RespBeanEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * <p>
@@ -28,18 +33,19 @@ public class OrderController {
     private OrderService orderService;
     /**
       * 订单详情
-      * @param user
       * @param orderId
       * @return
       */
   @RequestMapping("/detail")
   @ResponseBody
-  public RespBean detail(User user, Long orderId){
-   if (null==user){
-     return RespBean.error(RespBeanEnum.SESSION_ERROR);
-   }
-   OrderDetailVo detail = orderService.detail(orderId);
-   return RespBean.success(detail);
+  public RespBean detail(HttpServletRequest request,Long orderId){
+      String userJson = request.getHeader("user");
+      User user = new Gson().fromJson(userJson, User.class);
+      if (null==user){
+          return RespBean.error(RespBeanEnum.SESSION_ERROR);
+      }
+      OrderDetailVo detail = orderService.detail(orderId);
+      return RespBean.success(detail);
   }
 
 }
