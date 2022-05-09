@@ -41,6 +41,16 @@ spring:
                 replenishRate: 40 # 每秒生成令牌个数
                 burstCapacity: 200 # 令牌桶上线容量
       #default-filters: AuthGlobalFilter
+      # 网关跨域配置
+      globalcors:
+        cors-configurations:
+          '[/**]': # 匹配所有请求
+            allowedOrigins: "*" # 跨域处理 允许所有的域
+            allowedMethods: # 支持的方法
+              - GET
+              - POST
+              - PUT
+              - DELETE
 
   # 令牌桶使用到 Redis ,需要配置Redis连接属性
   redis:

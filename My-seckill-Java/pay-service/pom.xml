@@ -26,11 +26,28 @@
             <artifactId>cloud-seckill-demo</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        <!-- 微信/支付宝支付 -->
+<!--        &lt;!&ndash; 微信/支付宝支付 &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>cn.felord</groupId>-->
+<!--            <artifactId>payment-spring-boot-starter</artifactId>-->
+<!--            <version>1.0.12.RELEASE</version>-->
+<!--        </dependency>-->
+        <!--微信支付SDK-->
         <dependency>
-            <groupId>cn.felord</groupId>
-            <artifactId>payment-spring-boot-starter</artifactId>
-            <version>1.0.12.RELEASE</version>
+            <groupId>com.github.wechatpay-apiv3</groupId>
+            <artifactId>wechatpay-apache-httpclient</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+        <!--微信支付 APIv2 SDK-->
+        <dependency>
+            <groupId>com.github.wxpay</groupId>
+            <artifactId>wxpay-sdk</artifactId>
+            <version>0.0.3</version>
+        </dependency>
+        <!-- 生成自定义配置的元数据信息 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
         </dependency>
         <!-- web组件 -->
         <dependency>

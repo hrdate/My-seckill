@@ -85,5 +85,5 @@ public class Order implements Serializable {
     /**
      * 支付二维码
      */
-    private String code_url;
+    private String codeUrl;
 }

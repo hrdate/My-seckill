@@ -2,6 +2,7 @@ package com.payservice.service;
 
 import com.payservice.entity.Order;
 import com.baomidou.mybatisplus.extension.service.IService;
+import comment.OrderStatusEnum;
 
 /**
  * <p>
@@ -22,11 +23,16 @@ public interface OrderService extends IService<Order> {
 
 
     /**
-     * 完成支付后，修改订单的状态为已支付
+     * 获取订单的状态
      * @param orderId
      * @return
      */
-    boolean updateOrderToPayById(Long orderId);
+    Integer getOrderStatus(Long orderId);
 
-
+    /**
+     *
+     * @param orderId
+     * @param status
+     */
+    Boolean updateStatusByOrderNo(Long orderId, Integer status);
 }
