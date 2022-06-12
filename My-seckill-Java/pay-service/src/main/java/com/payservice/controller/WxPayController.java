@@ -42,7 +42,6 @@ public class WxPayController {
         log.info("发起支付请求 v3");
         //返回支付二维码连接和订单号
         Map<String, Object> map = wxPayService.nativePay(orderId);
-
         return RespBean.success(map);
     }
 

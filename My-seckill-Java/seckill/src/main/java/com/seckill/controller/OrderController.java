@@ -10,6 +10,7 @@ import com.seckill.vo.OrderDetailVo;
 import comment.RespBean;
 import comment.RespBeanEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,8 +37,7 @@ public class OrderController {
       * @param orderId
       * @return
       */
-  @RequestMapping("/detail")
-  @ResponseBody
+  @GetMapping("/detail")
   public RespBean detail(HttpServletRequest request,Long orderId){
       String userJson = request.getHeader("user");
       User user = new Gson().fromJson(userJson, User.class);

@@ -90,13 +90,13 @@
     });
     function refreshCaptcha() {
         var goodsId = g_getQueryString("goodsId");
-        $("#captchaImg").attr("src", "/seckill/captcha?goodsId=" + goodsId + "&time=" + new Date())
+        $("#captchaImg").attr("src", "http://localhost:8083/seckill/captcha?goodsId=" + goodsId + "&time=" + new Date())
     }
 
     function getDetails() {
         var goodsId = g_getQueryString("goodsId");
         $.ajax({
-            url: "/goods/toDetail2/" + goodsId,
+            url: "http://localhost:8083/goods/toDetail2/" + goodsId,
             type: "GET",
             success: function (data) {
                 if (data.code == 200) {
@@ -147,7 +147,7 @@
             }
             $("#seckillTip").html("秒杀进行中");
             var goodsId = g_getQueryString("goodsId");
-            $("#captchaImg").attr("src", "/seckill/captcha?goodsId=" + goodsId);
+            $("#captchaImg").attr("src", "http://localhost:8083/seckill/captcha?goodsId=" + goodsId);
             $("#captchaImg").show();
             $("#captcha").show();
         } else {
@@ -162,7 +162,7 @@
         var captcha = $("#captcha").val();
         g_showLoading();
         $.ajax({
-            url: "/seckill/path",
+            url: "http://localhost:8083/seckill/path",
             type: "GET",
             data: {
                 goodsId: goodsId,
@@ -185,7 +185,7 @@
 
     function doSeckill(path) {
         $.ajax({
-            url: "/seckill/" + path +"/doSeckill2",
+            url: "http://localhost:8083/seckill/" + path +"/doSeckill2",
             type: "POST",
             data: {
                 goodsId: $("#goodsId").val(),
@@ -206,7 +206,7 @@
     function getResult(goodsId) {
         g_showLoading();
         $.ajax({
-            url: "/seckill/result",
+            url: "http://localhost:8083/seckill/result",
             type: "GET",
             data: {
                 goodsId: goodsId,

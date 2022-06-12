@@ -83,12 +83,12 @@ public class GoodsController {
         detailVo.setRemainSeconds(remainSeconds);
         return RespBean.success(detailVo);
     }
-    @GetMapping("/goods/feign/toList")
+    @GetMapping("/feign/toList")
     List<GoodsVo> findGoodsVo(){
         return goodsService.findGoodsVo();
     }
 
-    @GetMapping("/goods/feign/{id}")
+    @GetMapping("/feign/{id}")
     GoodsVo findGoodsVoByGoodsId(@PathVariable("id")long id){
         return goodsService.findGoodsVoByGoodsId(id);
     }
