@@ -36,7 +36,9 @@ cloud-seckill-demo ——  公共模块，存放exception包和utils包
 
 gateway ——  网关，端口8083
 
-seckill ——  秒杀模块，端口8084，并且在resources/static和resources/templates下存在前端资源（后期可升级为前后端分离）
+seckill-provide ——  秒杀模块，端口8084，并且在resources/static和resources/templates下存在前端资源（后期可升级为前后端分离）
+
+seckill-consumer ——  秒杀模块，端口8184
 
 good-service ——  商品模块，端口8085
 
