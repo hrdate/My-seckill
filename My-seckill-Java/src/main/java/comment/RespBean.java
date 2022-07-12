@@ -16,6 +16,10 @@ public class RespBean {
     public static RespBean success() {
         return new RespBean(RespBeanEnum.SUCCESS.getCode(), RespBeanEnum.SUCCESS.getMessage(), null);
     }
+
+    public static RespBean success(String message) {
+        return new RespBean(RespBeanEnum.SUCCESS.getCode(), message, null);
+    }
     /**
      * 成功返回结果
      *
@@ -36,6 +40,10 @@ public class RespBean {
 
     public static RespBean error() {
         return new RespBean(RespBeanEnum.FAILED.getCode(), RespBeanEnum.FAILED.getMessage(), null);
+    }
+
+    public static RespBean error(String message) {
+        return new RespBean(RespBeanEnum.FAILED.getCode(), message, null);
     }
 
     public static RespBean error(Object data) {

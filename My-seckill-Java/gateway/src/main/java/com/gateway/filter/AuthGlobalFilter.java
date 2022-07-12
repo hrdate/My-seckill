@@ -33,9 +33,9 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     private static Logger LOGGER = LoggerFactory.getLogger(AuthGlobalFilter.class);
 
     @Autowired
-    JwtUtil jwtUtil;
+    private JwtUtil jwtUtil;
     @Autowired
-    UserClient userClient;
+    private UserClient userClient;
 
 
     @Override

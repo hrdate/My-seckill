@@ -30,16 +30,19 @@ spring:
           filters:
             # 配置令牌桶
             - name: RequestRateLimiter
-          args:
-            # 如果keyResolver返回空key，则拒绝该请求403，默认true表示拒绝，false则表示允许访问
-            deny-empty-key: false
-            # 配置类：RateLimiter 实现类 RedisRateLimiter 对象
-            redis-rate-limiter:
-              # 自定义一个 keyResolver 实现 KeyResolver MyKeyResolver,注入容器,使用Spring的EL表达式读取值
-              key-resolver: "#{@myKeyResolver}"
-              redis-rate-limiter:
-                replenishRate: 40 # 每秒生成令牌个数
-                burstCapacity: 200 # 令牌桶上线容量
+              args:
+#                # 限流后向客户端返回的响应码429,请求太多
+                status-code : TOO_MANY_REQUESTS
+                # 配置类：RateLimiter 实现类 RedisRateLimiter 对象
+                redis-rate-limiter:
+                  defaultRateLimiter:
+                    defaultConfig:
+                      # 每秒生成令牌个数
+                      replenishRate: 10
+                      # 令牌桶上线容量
+                      burstCapacity: 50
+                    # 自定义一个 keyResolver 实现 KeyResolver MyKeyResolver,注入容器,使用Spring的EL表达式读取值
+                    defaultKeyResolver: '#{@myKeyResolver}'
       #default-filters: AuthGlobalFilter
       # 网关跨域配置
       globalcors:
