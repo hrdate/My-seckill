@@ -50,19 +50,22 @@ public class MQReceiver {
                 String messageBody = message.getBody().toString();
                 if (StringUtils.isNotBlank(messageBody)) {
                     SeckillMessage seckillMessage = JsonUtil.jsonStr2Object(messageBody, SeckillMessage.class);
+                    // 订单id
                     Long goodsId = seckillMessage.getGoodsId();
                     User user = seckillMessage.getUser();
+                    // 根据订单id查询订单详情
                     GoodsVo goods = goodsClient.findGoodsVoByGoodsId(goodsId);
                     //判断库存
                     if (goods.getStockCount() < 1) {
                         return;
                     }
-                    //判断是否重复抢购
+                    //查询redis缓存记录，判断是否重复抢购
                     String seckillOrderJson = (String)
                             redisTemplate.opsForValue().get("order:" + user.getId() + ":" + goodsId);
                     if (!StringUtils.isEmpty(seckillOrderJson)) {
                         return;
                     }
+                    // 进行扣减库存+生产秒杀订单
                     orderService.seckill(user, goods);
                 }
                 //deliveryTag:该消息的index,multiple：是否批量.true:将一次性ack所有小于deliveryTag的消息。
