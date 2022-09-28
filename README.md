@@ -26,6 +26,7 @@
 - [x] Mybatis-Plus操作数据库MySQL的InnoDB引擎执行SQL语句，且同时把用户id + 商品id设置为唯一索引
 - [x] 秒杀接口隐藏，定点修改界面JS
 - [x] hutool工具验证码
+- [x] rabbitmq延迟队列定时30分钟取消未支付的订单 
 - [ ] 页面静态化 + 部分对象静态化处理降低网络拥塞 ~~（也可以考虑使用CDN）~~
 
 
@@ -36,7 +37,9 @@ cloud-seckill-demo ——  公共模块，存放exception包和utils包
 
 gateway ——  网关，端口8083
 
-seckill ——  秒杀模块，端口8084，并且在resources/static和resources/templates下存在前端资源（后期可升级为前后端分离）
+seckill-provide ——  秒杀模块，端口8084，并且在resources/static和resources/templates下存在前端资源（后期可升级为前后端分离）
+
+seckill-consumer ——  秒杀模块，端口8184
 
 good-service ——  商品模块，端口8085
 
